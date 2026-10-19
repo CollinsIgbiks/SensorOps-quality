@@ -1,23 +1,6 @@
-# SensorOps — Project Brief
+# SensorOps: Design
 
-> **How to use this file:** paste or attach it at the start of a new AI chat, then say:
-> *"Read this brief. Check my environment first, then guide me through the next milestone step by step."*
-> Also commit it to each repo as `docs/PROJECT_BRIEF.md`.
-
----
-
-## 0. Instructions for the AI assistant helping me
-
-- **About me:** I'm Collins, an Electrical & Electronics Engineer (MSc) moving into software. I code in C/C++ and Python, and I've finished textbooks on Java and Go. I do freelance IoT and laser-comms work. I use VS Code, Git and GitHub.
-- **Why I'm building this:** a public portfolio project for job applications in three areas: **Java Software Engineer**, **Software Development Engineer in Test (SDET)** and **AI & Automation Solution Consultant**. My CV already lists it as "In Progress", so it has to be real, working and explainable.
-- **How to help me:**
-  1. Before anything else, check my tools (Section 7). I'm on **Windows 11** with PowerShell.
-  2. Work **one milestone at a time** (Section 6). Don't jump ahead.
-  3. Explain **why** each design choice was made. I need to defend every part of this in interviews.
-  4. Keep commits small and use Conventional Commit messages (`feat:`, `fix:`, `test:`, `ci:`, `docs:`).
-  5. Never put secrets (API keys, passwords, tokens) in code or commits. Use `.env` files (git-ignored) and GitHub Secrets.
-  6. Use current stable, LTS versions, and check them rather than guessing.
-  7. At the end of each milestone, give me (a) a short README update and (b) the numbers I should record for my CV (Section 8).
+This document describes what SensorOps does, how its three parts fit together, and the decisions behind them. The same document is kept in all three repositories.
 
 ---
 
@@ -27,17 +10,15 @@
 
 **The business problem:** facilities and engineering teams get flooded with raw sensor alerts and can't tell which ones matter. SensorOps stores the data reliably, flags readings that break their limits, uses AI to explain and rank each fault, and alerts a person only when something is critical.
 
-**Three parts in three GitHub repos:**
+**Three parts, three repos:**
 
-| Part | Repo | Tech | Shows I can do |
+| Part | Repo | Tech | Focus |
 |---|---|---|---|
-| 1. Telemetry API | `sensorops-api` | Java 25, Spring Boot 4, PostgreSQL, Docker, GitHub Actions | Java backend, object-oriented design, databases, CI/CD, cloud |
-| 2. AI Alert Triage | `sensorops-ai-triage` | n8n (low-code), generative AI, Python | AI use cases, low-code automation, pilots with measured results |
-| 3. Quality Pipeline | `sensorops-quality` | Java 25, REST-Assured, Playwright, JUnit 5, k6, OWASP ZAP, Allure | Test automation, smoke/regression suites, CI/CD, performance and security testing |
+| 1. Telemetry API | [`sensorops-api`](https://github.com/CollinsIgbiks/sensorops-api) | Java 25, Spring Boot 4, PostgreSQL, Docker, GitHub Actions | Java backend, object-oriented design, databases, CI/CD, cloud |
+| 2. AI Alert Triage | [`sensorops-ai-triage`](https://github.com/CollinsIgbiks/sensorops-ai-triage) | n8n (low-code), generative AI, Python | AI use cases, low-code automation, pilots with measured results |
+| 3. Quality Pipeline | [`sensorops-quality`](https://github.com/CollinsIgbiks/sensorops-quality) | Java 25, REST-Assured, Playwright, JUnit 5, k6, OWASP ZAP, Allure | Test automation, smoke/regression suites, CI/CD, performance and security testing |
 
-GitHub user: **github.com/CollinsIgbiks**
-
-### Version decisions (October 2026)
+### Technology decisions (October 2026)
 - **Java 25 (Eclipse Temurin)** instead of Java 21: Java 25 is the current LTS, and Oracle's free updates for JDK 21 ended in September 2026. Temurin is free with no licence questions.
 - **Spring Boot 4.x** instead of 3.x: it's the current stable generation (built on Spring Framework 7).
 - **Python 3.15**: the current stable release.
@@ -121,10 +102,10 @@ Use DTOs for requests and responses (never expose entities directly), plus one g
 - `docker compose up` starts everything with one command.
 - **Stretch goal:** deploy to a free cloud tier (e.g. Render or Railway) with a live Swagger URL in the README.
 
-### 3.6 Agile evidence
-Use a GitHub Projects board with columns Backlog / To Do / In Progress / Done. Write each feature as a user story ("As a facilities engineer, I want… so that…") with acceptance criteria. Work in one-week sprints and link each commit and PR to its issue.
+### 3.6 How the work is planned
+Work is tracked on a public [GitHub Projects board](https://github.com/users/CollinsIgbiks/projects/2) with Backlog / To Do / In Progress / Done columns and one-week sprints. Features are written as user stories with acceptance criteria, and every commit and pull request links to its issue.
 
-### 3.7 Open design points (decide in the milestone named)
+### 3.7 Open design questions
 - **Milestones 4/6:** a stuck sensor reading a normal value never breaks a threshold, so it never raises an alert. Either add a "flatline" rule to the API or report this as a known limitation in `PILOT_RESULTS.md`.
 - **Milestones 3/8:** protect `PATCH /api/alerts/{id}` (e.g. a shared API key header sent by n8n) so verdicts can't be rewritten by anyone.
 - **Milestone 8:** the UI tests target saucedemo.com because SensorOps has no UI. Be ready to explain that, or add a small alerts dashboard later.
@@ -154,7 +135,7 @@ Use a GitHub Projects board with columns Backlog / To Do / In Progress / Done. W
 6. **IF CRITICAL**: send an instant Telegram/email alert.
 7. **Schedule trigger** (daily): an AI-written summary of the day's alerts.
 
-### 4.4 Pilot evaluation (this is the consultant-role evidence)
+### 4.4 Pilot evaluation
 - Run the simulator for at least 500 readings.
 - Compare the AI's categories and urgencies with the simulator's labelled CSV.
 - Report: total readings, alerts raised, critical escalations, **category accuracy %**, **urgency accuracy %**, and examples of failures and what changed in the prompt.
@@ -191,65 +172,21 @@ Use a GitHub Projects board with columns Backlog / To Do / In Progress / Done. W
 - **k6:** ramp to, for example, 50 virtual users posting readings. Record p95 response time and error rate, with thresholds that fail the build if they're breached.
 - **ZAP baseline:** run against the API and record findings, then fix or document them.
 
-### 5.5 Testing types covered (maps to the SDET job description)
+### 5.5 Testing types covered
 White-box (unit tests in Part 1) · black-box (API and UI here) · integration and end-to-end (Testcontainers + Docker Compose) · performance (k6) · UI (Playwright) · security (ZAP) · smoke, sanity and regression (tags + CI schedule).
 
 ---
 
-## 6. Milestones (build in this order)
+## 6. Roadmap
 
-| # | Milestone | Done when |
-|---|---|---|
-| 1 | **Setup:** create 3 repos, profile README, GitHub Projects board, copy this brief into `docs/` | Repos public, each with a README stub and first commit |
-| 2 | **API core:** devices, thresholds, readings, Postgres + Flyway, Docker Compose | `docker compose up` works and endpoints work in Swagger |
-| 3 | **API alerts + tests:** alert logic, webhook call, unit and Testcontainers tests, CI, GHCR image | CI green, coverage ≥ 80% on services |
-| 4 | **Simulator:** Python simulator + labelled CSV | Streams readings into the API and alerts appear |
-| 5 | **n8n triage:** full workflow + write-back + Sheets + alerts | A critical fault reaches my phone with an AI explanation |
-| 6 | **Pilot evaluation:** 500+ readings, accuracy measured, `PILOT_RESULTS.md` | Numbers recorded |
-| 7 | **Quality: API tests:** REST-Assured smoke + regression running in CI | Smoke on push, regression nightly |
-| 8 | **Quality: UI, performance, security:** Playwright POM, k6, ZAP, Allure on Pages | Report link live in README |
-| 9 | **Polish:** READMEs, diagrams, demo GIFs, optional cloud deploy | A recruiter understands each repo in 60 seconds |
-
-Rough timeline: about 6 weekends.
-
----
-
-## 7. My environment
-
-Checked and working (October 2026, Windows 11):
-
-| Tool | Version / notes |
-|---|---|
-| JDK | Eclipse Temurin 25, `JAVA_HOME` set |
-| Maven | Not installed globally; each project uses the Maven Wrapper (`mvnw.cmd`) |
-| Python | 3.15; use `py -m pip` (bare `pip` isn't on PATH) |
-| Docker | Docker Desktop on WSL 2; `hello-world` runs |
-| Git | Installed; commits use my GitHub noreply email |
-| GitHub | Authenticated from my PC |
-| VS Code | 1.141.0, with: Extension Pack for Java, Spring Boot Extension Pack, Python, Docker, GitHub Actions |
-
-Still needed later: **k6**, an Ollama model or an AI API key, a Telegram bot token, a Google account for Sheets, and the Jira free plan.
-
----
-
-## 8. What to record for my CV
-
-Record these as I go, as **real numbers only**:
-- API: number of endpoints, test count, coverage %, CI build time, live URL (if deployed)
-- AI triage: readings processed, alerts raised, critical escalations, category and urgency accuracy %, prompt iterations
-- Quality: number of automated tests (API / UI), smoke run time, k6 p95 latency and error rate, ZAP findings fixed
-- Agile: number of sprints, user stories completed
-
-These replace the "In Progress" bullets on my three CVs once each part is done.
-
----
-
-## 9. README template (each repo)
-
-1. **SensorOps: [Part name]** + one-line description + where it fits (link to the architecture diagram)
-2. The problem it solves
-3. Architecture / workflow screenshot
-4. How to run it (copy-paste commands)
-5. Tests and CI (badges, Allure link)
-6. Results (real numbers)
-7. What I'd do next
+| # | Milestone | Done when | Status |
+|---|---|---|---|
+| 1 | Setup: repositories, project board, design document | Repos public with a first commit | ✅ Done |
+| 2 | API core: devices, thresholds, readings, PostgreSQL + Flyway, Docker Compose | `docker compose up` works and endpoints work in Swagger | ⏳ Next |
+| 3 | API alerts and tests: alert logic, webhook call, unit and Testcontainers tests, CI, GHCR image | CI green, service coverage ≥ 80% | |
+| 4 | Sensor simulator with a labelled fault CSV | Readings stream into the API and alerts appear | |
+| 5 | n8n triage: full workflow, write-back, Sheets log and alerts | A critical fault reaches a phone with an AI explanation | |
+| 6 | Pilot evaluation: 500+ readings, accuracy measured | `PILOT_RESULTS.md` published | |
+| 7 | Quality: REST-Assured smoke and regression suites in CI | Smoke on push, regression nightly | |
+| 8 | Quality: Playwright, k6, ZAP, Allure on GitHub Pages | Report link live in the README | |
+| 9 | Polish: diagrams, demo GIFs, optional cloud deployment | Each repo understandable in 60 seconds | |
